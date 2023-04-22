@@ -1,0 +1,94 @@
+{
+	"info": {
+		"_postman_id": "82395709-c937-433d-85bc-949bff9cebcd",
+		"name": "Новый пользователь_SOAP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16377691"
+	},
+	"item": [
+		{
+			"name": "DoRegister",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Compare email from request body with email from response body\r",
+							"\r",
+							"pm.test(\"Compare email value from requestBody with value from responseBody\", function () {\r",
+							"    var jsRequest = xml2Json(pm.request.body.raw);\r",
+							"    var email_req = jsRequest['soapenv:Envelope']['soapenv:Body']['wrap:doRegister']['email'];\r",
+							"    var jsResponse = xml2Json(responseBody);\r",
+							"    var email_resp = jsResponse['SOAP-ENV:Envelope']['SOAP-ENV:Body']['ns1:doRegisterResponse']['return']['email']['_'];\r",
+							"    pm.collectionVariables.set(\"email_resp\", email_resp);\r",
+							"    pm.expect(email_req).is.to.eql(email_resp);\r",
+							"});\r",
+							"\r",
+							"// Get a message when trying to register with an already registered email\r",
+							"pm.test(\"Get message 'email уже есть в базе'\", function () {\r",
+							"    var jsonData = xml2Json(responseBody);\r",
+							"    var message = jsonData['SOAP-ENV:Envelope']['SOAP-ENV:Body']['ns1:doRegisterResponse']['return']['message']['_'];\r",
+							"    pm.expect(message).is.to.eql('email'+ ' ' + pm.collectionVariables.get(\"email_resp\") + ' ' + 'уже есть в базе');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wrap=\"http://foo.bar/wrappersoapserver\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <wrap:doRegister>\r\n         <email>qq34@gmail.com</email>\r\n         <name>qq564</name>\r\n         <password>1</password>\r\n      </wrap:doRegister>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/doRegister",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"doRegister"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://users.bugred.ru/tasks/soap/WrapperSoapServer.php",
+			"type": "string"
+		},
+		{
+			"key": "email_resp",
+			"value": ""
+		}
+	]
+}
